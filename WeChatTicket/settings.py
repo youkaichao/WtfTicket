@@ -15,11 +15,16 @@ import json
 import logging
 import urllib.parse
 
+travis = os.getenv('BUILD_ON_TRAVIS', None)
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+if travis:
+    configFileName = 'configs.travis.json'
+else:
+    configFileName = 'configs.json'
 # Configurations load from file
-CONFIGS = json.loads(open(os.path.join(BASE_DIR, 'configs.json')).read())
+CONFIGS = json.loads(open(os.path.join(BASE_DIR, configFileName)).read())
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -28,6 +33,7 @@ CONFIGS = json.loads(open(os.path.join(BASE_DIR, 'configs.json')).read())
 SECRET_KEY = CONFIGS['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = CONFIGS['DEBUG']
 
 # SECURITY WARNING: don't run with IGNORE_WECHAT_SIGNATURE turned on in production!

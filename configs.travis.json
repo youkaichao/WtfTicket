@@ -1,0 +1,19 @@
+{
+    "SECRET_KEY": "youcannotseeme233333333333333333333333333333333333",
+    "DEBUG": false,
+    "IGNORE_WECHAT_SIGNATURE": true,
+    "WECHAT_TOKEN": "",
+    "WECHAT_APPID": "",
+    "WECHAT_SECRET": "",
+    "DB_NAME": "travis_ci_db",
+    "DB_USER": "travis",
+    "DB_PASS": "",
+    "DB_HOST": "127.0.0.1",
+    "DB_PORT": "3306",
+    "SITE_DOMAIN": "",
+    "USERNAME": "",
+    "PASSWORD": "",
+    "IPADDRESS": "",
+    "ROOTDIR": "",
+    "PORT": 0
+}
