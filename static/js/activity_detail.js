@@ -14,6 +14,25 @@ function check_percent(p) {
 }
 
 function checktime(){
+    var checklist = ['#input-start-year','#input-start-month','#input-start-day','#input-start-hour','#input-start-minute',
+                     '#input-end-year','#input-end-month','#input-end-day','#input-end-hour','#input-end-minute',
+                     '#input-book-start-year','#input-book-start-month','#input-book-start-day','#input-book-start-hour','#input-book-start-minute',
+                     '#input-book-end-year','#input-book-end-month','#input-book-end-day','#input-book-end-hour','#input-book-end-minute'];
+    for(var i in checklist){
+        var value = $(checklist[i]).val();
+        if (value == '' || value == undefined){
+            $(checklist[i]).popover({
+                html: true,
+                placement: 'top',
+                title:'',
+                content: '<span style="color:red;">不应为空</span>',
+                trigger: 'focus',
+                container: 'body'
+            });
+            $(checklist[i]).focus();
+            return false;
+        }
+    }
     var actstart = new Date($('#input-start-year').val(), $('#input-start-month').val()-1, $('#input-start-day').val(), $('#input-start-hour').val(), $('#input-start-minute').val());
     var actend = new Date($('#input-end-year').val(), $('#input-end-month').val()-1, $('#input-end-day').val(), $('#input-end-hour').val(), $('#input-end-minute').val());
     var bookstart = new Date($('#input-book-start-year').val(), $('#input-book-start-month').val()-1, $('#input-book-start-day').val(), $('#input-book-start-hour').val(), $('#input-book-start-minute').val());
