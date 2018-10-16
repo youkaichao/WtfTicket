@@ -7,11 +7,11 @@ from WeChatTicket.settings import WECHAT_TOKEN, WECHAT_APPID, WECHAT_SECRET
 
 
 class CustomWeChatView(WeChatView):
-
     lib = WeChatLib(WECHAT_TOKEN, WECHAT_APPID, WECHAT_SECRET)
 
     handlers = [
-        HelpOrSubscribeHandler, UnbindOrUnsubscribeHandler, BindAccountHandler, BookEmptyHandler,
+        HelpOrSubscribeHandler, UnbindOrUnsubscribeHandler, BindAccountHandler, BookEmptyHandler, SnapUpTicketHandler,
+        CancelTicketHandler, WithdrawTicketHandler, BookWhatHandler, LookUpTicketHandler,
     ]
     error_message_handler = ErrorHandler
     default_handler = DefaultHandler

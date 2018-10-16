@@ -1,4 +1,6 @@
-from django.db import models
+import uuid
+
+from django.db import models, transaction
 
 from codex.baseerror import LogicError
 
@@ -47,6 +49,36 @@ class Activity(models.Model):
         except cls.DoesNotExist:
             raise LogicError('Activity not found')
 
+    @classmethod
+    def get_by_activity_key(cls, activity_key):
+        try:
+            return cls.objects.get(key=activity_key)
+        except cls.DoesNotExist:
+            raise LogicError('Activity not found')
+
+    @classmethod
+    def decrease_ticket_exclusive(cls, activity_id):
+        with transaction.atomic():
+            try:
+                activity = cls.objects.select_for_update().get(id=activity_id)
+            except cls.DoesNotExist:
+                return False  # cannot find activity, book fail
+            if activity.remain_tickets <= 0:
+                return False  # no ticket remained
+            activity.remain_tickets -= 1
+            activity.save()
+            return True  # book ticket success
+
+    @classmethod
+    def increase_ticket_exclusive(cls, activity_id):
+        with transaction.atomic():
+            try:
+                activity = cls.objects.select_for_update().get(id=activity_id)
+            except cls.DoesNotExist:
+                return  # cannot find activity, book fail
+            activity.remain_tickets += 1
+            activity.save()
+
 
 class Ticket(models.Model):
     student_id = models.CharField(max_length=32, db_index=True)
@@ -57,6 +89,17 @@ class Ticket(models.Model):
     STATUS_CANCELLED = 0
     STATUS_VALID = 1
     STATUS_USED = 2
+
+    def assign_uuid(self):
+        res = uuid.uuid3(uuid.NAMESPACE_URL, str(uuid.uuid4()) + str(self.id))
+        self.unique_id = res
+
+    @classmethod
+    def create_ticket(cls, student_id, activity):
+        ticket = Ticket(student_id=student_id, activity=activity, status=Ticket.STATUS_VALID)  # default status is valid
+        ticket.assign_uuid()
+        ticket.save()
+        return ticket
 
     @classmethod
     def get_by_ticket_unique_id(cls, ticket_unique_id):

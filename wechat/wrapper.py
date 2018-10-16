@@ -15,12 +15,10 @@ from WeChatTicket import settings
 from codex.baseview import BaseView
 from wechat.models import User
 
-
 __author__ = "Epsirom"
 
 
 class WeChatHandler(object):
-
     logger = logging.getLogger('WeChat')
 
     def __init__(self, view, msg, user):
@@ -52,10 +50,11 @@ class WeChatHandler(object):
         ))
 
     def reply_news(self, articles):
-        if len(articles) > 10:
-            self.logger.warn('Reply with %d articles, keep only 10', len(articles))
+        article_limit = 8
+        if len(articles) > article_limit:
+            self.logger.warn('Reply with %d articles, keep only %d', len(articles), article_limit)
         return get_template('news.xml').render(self.get_context(
-            Articles=articles[:10]
+            Articles=articles[:article_limit]
         ))
 
     def reply_single_news(self, article):
@@ -89,6 +88,22 @@ class WeChatHandler(object):
     def url_bind(self):
         return settings.get_url('u/bind', {'openid': self.user.open_id})
 
+    def url_ticket_detail(self, ticket):
+        return settings.get_url('u/ticket', {'openid': self.user.open_id, 'ticket': ticket.unique_id})
+
+    @staticmethod
+    def url_activity_detail(activity):
+        return settings.get_url('u/activity', {'id': activity.id})
+
+    def extract_activity_name(self):
+        text = self.input['Content']
+        texts = text.split(' ', 1)
+        if len(texts) == 1:
+            text = ''
+        else:
+            text = texts[1]
+        return text.strip()
+
 
 class WeChatEmptyHandler(WeChatHandler):
 
@@ -111,7 +126,6 @@ class WeChatError(Exception):
 
 
 class WeChatLib(object):
-
     logger = logging.getLogger('wechatlib')
     access_token = ''
     access_token_expire = datetime.datetime.fromtimestamp(0)
@@ -153,7 +167,7 @@ class WeChatLib(object):
     @classmethod
     def get_wechat_access_token(cls):
         if datetime.datetime.now() >= cls.access_token_expire:
-            print("appid=%s secret=%s" %(cls.appid, cls.secret))
+            print("appid=%s secret=%s" % (cls.appid, cls.secret))
             res = cls._http_get(
                 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s' % (
                     cls.appid, cls.secret
@@ -188,7 +202,6 @@ class WeChatLib(object):
 
 
 class WeChatView(BaseView):
-
     logger = logging.getLogger('WeChat')
 
     lib = WeChatLib('', '', '')
