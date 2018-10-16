@@ -12,15 +12,8 @@ class UserBind(APIView):
         input: self.input['student_id'] and self.input['password']
         raise: ValidateError when validating failed
         """
-        try:
-            # to ensure user has a unique student_id,
-            # if we find student_id has been bind,
-            # raise ValidateError
-            _ = User.get_by_student_id(self.input['student_id'])
-        except LogicError:
-            pass
-        else:
-            raise ValidateError('Same student_id has been used.')
+        # unique student_id is not required
+        pass
 
     def get(self):
         self.check_input('openid')
@@ -83,11 +76,12 @@ class TicketDetail(APIView):
         ticket_unique_id = self.input['ticket']
         ticket = Ticket.get_by_ticket_unique_id(ticket_unique_id)
 
-        # check if owner of the ticket has same openid with the query
+        # check if owner of the ticket has same student_id with the query
+        # cannot match by open_id: one student_id can have multiple open_id
         owner_student_id = ticket.student_id
-        owner_open_id = User.get_by_student_id(owner_student_id).open_id
+        query_student_id = User.get_by_openid(openid).student_id
 
-        if owner_open_id == openid:
+        if owner_student_id == query_student_id:
             return TicketDetail.make_detail(ticket)
         else:
             raise ValidateError('You don\'t have permission to view this ticket.')
