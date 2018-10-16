@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.utils import timezone
 from django.contrib.auth import logout, authenticate, login
 from codex.baseview import APIView
 from wechat.models import Activity, Ticket
@@ -154,14 +155,12 @@ class ActivityMenu(APIView):
             raise LogicError("No ticket menu.")
         index = names.index("抢票")
         already_in = [x['name'] for x in buttons[index]['sub_button']]
-        data = list(Activity.objects.all())
+        data = list(Activity.objects.filter(status=Activity.STATUS_PUBLISHED, book_end__gt=timezone.now()))
         return [{
             'id': x.id,
             'name': x.name,
-            'menuIndex': 0
-        }
-            for x in data if x.name not in already_in
-        ]
+            'menuIndex': 0 if x.name not in already_in else already_in.index(x.name) + 1
+        } for x in data ]
 
     @require_logged_in
     def post(self):
