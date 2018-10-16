@@ -40,7 +40,12 @@ class APIView(BaseView):
 
     @property
     def body(self):
-        return json.loads(self.request.body.decode() or '{}')
+        content = self.request.body.decode() or '{}'
+        # if we don't do this, error
+        # "json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+        # will occur
+        content = content.replace("'", '"')
+        return json.loads(content)
 
     @property
     def query(self):
