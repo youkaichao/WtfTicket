@@ -23,7 +23,7 @@ from WeChatTicket import settings
 
 urlpatterns = [
     url(r'^wechat/?$', CustomWeChatView.as_view()),
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/?', admin.site.urls),
     url(r'^api/u/', include('userpage.urls')),
     url(r'^api/a/', include('adminpage.urls')),
 ]
