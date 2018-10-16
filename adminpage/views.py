@@ -100,8 +100,7 @@ class ImageUpload(APIView):
         filename = md5 + '.' + image._name.split('.')[-1]
         with open(os.path.join(settings.STATIC_ROOT, 'img', filename), 'wb') as f:
             f.write(content)
-        return urllib.parse.urljoin(urllib.parse.urljoin(settings.CONFIGS['SITE_DOMAIN'], settings.STATIC_URL), 'img/' + filename)
-
+        return urllib.parse.urljoin(settings.CONFIGS['SITE_DOMAIN'], 'img/' + filename)
 
 class ActivityDetail(APIView):
     @require_logged_in
