@@ -78,7 +78,8 @@ class ActivityCreate(APIView):
     def post(self):
         self.check_input('name', 'key', 'place', 'description', 'picUrl', 'startTime', 'endTime', 'bookStart',
                          'bookEnd', 'totalTickets', 'status')
-# FIX ME: startTime and endTIme are not correctly checked.
+        if len(list(Activity.objects.filter(key=self.input['key']))) > 0:
+            raise InputError("activity key %s already exists! use another key instead." % (self.input['key']))
         q = Activity(name=self.input['name'], key=self.input['key'], place=self.input['place'],
                      description=self.input['description'], pic_url=self.input['picUrl'],
                      start_time=self.input['startTime'], end_time=self.input['endTime'],

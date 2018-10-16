@@ -370,6 +370,7 @@
             }, function (errno, errmsg, e) {
                 // fail
                 locals.processResult = '失败: [' + errno + '] ' + errmsg + (e ? ": " + e : "");
+                locals.activity.status = 0;
             }, function (data) {
                 // before
                 data.status = 0;
@@ -396,6 +397,7 @@
 
             }, function (errno, errmsg, e) {
                 locals.processResult = '失败: [' + errno + '] ' + errmsg + (e ? ": " + e : "");
+                locals.activity.status = 0;
             }, function (data) {
                 data.status = 0;
                 wrapDate(data, 'startTime', 'endTime', 'bookStart', 'bookEnd');
@@ -482,6 +484,7 @@
                 }
             }, function (errno, errmsg, e) {
                 locals.processResult = '失败: [' + errno + '] ' + errmsg + (e ? ": " + e : "");
+                locals.activity.status = 0;
             }, function () {
                 locals.status = 2;
                 render();
