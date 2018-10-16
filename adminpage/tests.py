@@ -29,6 +29,12 @@ class BackendAPITest(TestCase):
         user = User.objects.create_user(username='a', password='b')
         user.save()
 
+    def tearDown(self):
+        for q in User.objects.all():
+            q.delete()
+        for q in Activity.objects.all():
+            q.delete()
+
     def checkURL(self, client, url, method, data, expect_code):
         if method == 'get':
             response = client.__getattribute__(method)(url, data=data)
