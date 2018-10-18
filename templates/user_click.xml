@@ -1,0 +1,6 @@
+{% extends "base.xml" %}
+{% block msg_type %}event{% endblock %}
+{% block content %}
+    <Event><![CDATA[CLICK]]></Event>
+    <EventKey><![CDATA[{{ EventKey }}]]></EventKey>
+{% endblock %}

@@ -102,7 +102,7 @@ class SnapUpTicketHandler(WeChatHandler):
         """
         :return: current server time, type float
         """
-        return time.time()
+        return timezone.now().timestamp()
 
     def handle(self):
         try:
@@ -156,6 +156,9 @@ class CancelTicketHandler(WeChatHandler):
         if activity is None or activity.status != Activity.STATUS_PUBLISHED:
             return self.reply_text(self.get_message('cancel_activity_not_found'))
 
+        if self.user.student_id == '':  # not bind yet
+            return self.reply_text(self.get_message('id_not_bind'))
+
         ticket = Ticket.objects.filter(student_id=self.user.student_id, activity=activity,
                                        status=Ticket.STATUS_VALID).first()
         if ticket is None:
@@ -179,6 +182,9 @@ class WithdrawTicketHandler(WeChatHandler):
         activity = Activity.objects.filter(key=text).first()
         if activity is None or activity.status != Activity.STATUS_PUBLISHED:
             return self.reply_text(self.get_message('activity_not_found'))
+
+        if self.user.student_id == '':  # not bind yet
+            return self.reply_text(self.get_message('id_not_bind'))
 
         ticket = Ticket.objects.filter(student_id=self.user.student_id, activity=activity,
                                        status=Ticket.STATUS_VALID).first()
@@ -224,6 +230,9 @@ class LookUpTicketHandler(WeChatHandler):
         return self.is_event_click(self.view.event_keys['get_ticket'])
 
     def handle(self):
+        if self.user.student_id == '':  # not bind yet
+            return self.reply_text(self.get_message('id_not_bind'))
+
         tickets = Ticket.objects.filter(
             status=Ticket.STATUS_VALID, student_id=self.user.student_id
         ).order_by('id')
@@ -231,12 +240,13 @@ class LookUpTicketHandler(WeChatHandler):
         articles = []
         for ticket in tickets:
             activity = ticket.activity
-            articles.append({
-                'Title': self.get_message('ticket_title', activity=activity),
-                'Description': self.get_message('ticket_description', activity=activity),
-                'Url': self.url_ticket_detail(ticket),
-                'PicUrl': activity.pic_url,
-            })
+            if activity.status == Activity.STATUS_PUBLISHED:  # deleted activity will be excluded
+                articles.append({
+                    'Title': self.get_message('ticket_title', activity=activity),
+                    'Description': self.get_message('ticket_description', activity=activity),
+                    'Url': self.url_ticket_detail(ticket),
+                    'PicUrl': activity.pic_url,
+                })
 
         if len(articles) == 0:
             return self.reply_text(self.get_message('ticket_empty'))
