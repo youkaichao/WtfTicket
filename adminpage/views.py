@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db import transaction
 from django.utils import timezone
 from django.contrib.auth import logout, authenticate, login
 from codex.baseview import APIView
@@ -175,15 +176,16 @@ class ActivityCheckin(APIView):
         if ('ticket' in self.input and 'studentId' in self.input) or ('ticket' not in self.input and 'studentId' not in self.input):
             raise InputError(
                 "Ticket and student ID, you can provide and only provide one.")
-        if 'ticket' in self.input:
-            x = Ticket.objects.get(unique_id=self.input['ticket'])
-        else:
-            x = Ticket.objects.get(student_id=self.input['studentId'])
-        if x.status != Ticket.STATUS_VALID:
-            raise Exception('ticket already used' if x.status ==
-                            Ticket.STATUS_USED else 'ticket already cancelled')
-        x.status = Ticket.STATUS_USED
-        x.save()
+        with transaction.atomic():
+            if 'ticket' in self.input:
+                x = Ticket.objects.select_for_update().get(unique_id=self.input['ticket'])
+            else:
+                x = Ticket.objects.select_for_update().get(student_id=self.input['studentId'])
+            if x.status != Ticket.STATUS_VALID:
+                raise Exception('ticket already used' if x.status ==
+                                Ticket.STATUS_USED else 'ticket already cancelled')
+            x.status = Ticket.STATUS_USED
+            x.save()
         return {
             'ticket': x.unique_id,
             'studentId': x.student_id
