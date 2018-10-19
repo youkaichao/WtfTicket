@@ -23,6 +23,19 @@ class User(models.Model):
         except cls.DoesNotExist:
             raise LogicError('User not found')
 
+    @classmethod
+    def bind_user_and_openid(cls, student_id, open_id):
+        with transaction.atomic():
+            old_user = cls.objects.select_for_update().filter(student_id=student_id).first()
+            if old_user is not None:
+                return False  # already binded
+            user = cls.objects.select_for_update().filter(open_id=open_id).first()
+            if user is None:
+                return False  # cannot find current user
+            user.student_id = student_id
+            user.save()
+            return True  # success
+
 
 class Activity(models.Model):
     name = models.CharField(max_length=128)
@@ -92,7 +105,7 @@ class Ticket(models.Model):
 
     def assign_uuid(self):
         res = uuid.uuid3(uuid.NAMESPACE_URL, str(uuid.uuid4()) + str(self.id))
-        self.unique_id = res
+        self.unique_id = str(res)
 
     @classmethod
     def create_ticket(cls, student_id, activity):

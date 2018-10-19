@@ -152,11 +152,11 @@ class UserPageTest(TestCase):
         })
         self.assertEqual(resp.status_code, 200)
         resp = json.loads(resp.content.decode())
-        self.assertEqual(resp['code'], 0)
+        self.assertEqual(resp['code'], 3)
 
-        self.assertEqual(
-            User.get_by_openid('B72AAF5F26554351B768642D7618ECCE42EA2BEEA9DE4B108E59744CFC028044').student_id,
-            '2016012345'
+        self.assertNotEqual(
+            User.get_by_student_id('2016012345'),
+            'B72AAF5F26554351B768642D7618ECCE42EA2BEEA9DE4B108E59744CFC028044'
         )
 
     def test_activity_detail_get_1(self):

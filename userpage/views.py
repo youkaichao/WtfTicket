@@ -12,8 +12,12 @@ class UserBind(APIView):
         input: self.input['student_id'] and self.input['password']
         raise: ValidateError when validating failed
         """
-        # unique student_id is not required
-        pass
+        # unique student_id is required
+        open_id = self.input['openid']
+        student_id = self.input['student_id']
+        ret = User.bind_user_and_openid(student_id, open_id)
+        if not ret:  # bind fail
+            raise ValidateError('student id already binded')
 
     def get(self):
         self.check_input('openid')
@@ -21,10 +25,7 @@ class UserBind(APIView):
 
     def post(self):
         self.check_input('openid', 'student_id', 'password')
-        user = User.get_by_openid(self.input['openid'])
         self.validate_user()
-        user.student_id = self.input['student_id']
-        user.save()
 
 
 class ActivityDetail(APIView):
@@ -77,7 +78,6 @@ class TicketDetail(APIView):
         ticket = Ticket.get_by_ticket_unique_id(ticket_unique_id)
 
         # check if owner of the ticket has same student_id with the query
-        # cannot match by open_id: one student_id can have multiple open_id
         owner_student_id = ticket.student_id
         query_student_id = User.get_by_openid(openid).student_id
 
