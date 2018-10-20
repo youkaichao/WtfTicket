@@ -78,13 +78,15 @@ class UserPageTest(TestCase):
             student_id='2016012345',
             unique_id='6131D02D549744E29D335CAC9E60FAB2',
             activity=activity_7e,
-            status=Ticket.STATUS_VALID
+            status=Ticket.STATUS_VALID,
+            activity_quick_id=activity_7e.id
         )
         Ticket.objects.create(
             student_id='2018000000',
             unique_id='D42789364EA04E228585AEE95562D487',
             activity=activity_8d,
-            status=Ticket.STATUS_VALID
+            status=Ticket.STATUS_VALID,
+            activity_quick_id=activity_8d.id
         )
 
     def test_user_bind_get_1(self):
