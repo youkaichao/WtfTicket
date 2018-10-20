@@ -115,7 +115,7 @@ class SnapUpTicketHandler(WeChatHandler):
         if self.user.student_id == '':  # not bind yet
             return self.reply_text(self.get_message('id_not_bind'))
 
-        old_ticket = Ticket.objects.filter(student_id=self.user.student_id, activity=activity,
+        old_ticket = Ticket.objects.filter(student_id=self.user.student_id, activity_id=activity.id,
                                            status=Ticket.STATUS_VALID).first()
         if old_ticket is not None:  # in fact, it is not snap up ticket, it is withdraw ticket
             return self.reply_single_news({
