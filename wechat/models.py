@@ -97,7 +97,7 @@ class Ticket(models.Model):
     student_id = models.CharField(max_length=32, db_index=True)
     unique_id = models.CharField(max_length=64, db_index=True, unique=True)
     status = models.IntegerField(db_index=True)
-    activity_id = models.IntegerField(db_index=True)
+    activity_quick_id = models.IntegerField(db_index=True)
     activity = models.ForeignKey(Activity)
 
     STATUS_CANCELLED = 0
@@ -111,7 +111,7 @@ class Ticket(models.Model):
     @classmethod
     def create_ticket(cls, student_id, activity):
         ticket = Ticket(student_id=student_id, activity=activity, status=Ticket.STATUS_VALID,
-                        activity_id=activity.id)  # default status is valid
+                        activity_quick_id=activity.id)  # default status is valid
         ticket.assign_uuid()
         ticket.save()
         return ticket
