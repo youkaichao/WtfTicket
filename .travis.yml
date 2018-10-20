@@ -9,7 +9,6 @@ env:
   install:
   - pip install -q -r requirements.txt
 before_script:
-  - mysql -e 'drop database travis_ci_db;'
   - mysql -e 'create database travis_ci_db;'
   - python manage.py makemigrations
   - python manage.py migrate
