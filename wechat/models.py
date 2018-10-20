@@ -83,6 +83,17 @@ class Activity(models.Model):
             return True  # book ticket success
 
     @classmethod
+    def decrease_ticket_dangerous_not_exclusive(cls, activity_id):
+        activity = cls.objects.filter(id=activity_id).first()
+        if activity is None:
+            return False  # cannot find activity, book fail
+        if activity.remain_tickets <= 0:
+            return False  # no ticket remained
+        activity.remain_tickets -= 1
+        activity.save()
+        return True  # book ticket success
+
+    @classmethod
     def increase_ticket_exclusive(cls, activity_id):
         with transaction.atomic():
             try:

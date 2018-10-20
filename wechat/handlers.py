@@ -131,7 +131,7 @@ class SnapUpTicketHandler(WeChatHandler):
         if self.get_current_time() > activity.book_end.timestamp():  # end already
             return self.reply_text(self.get_message('book_end_already'))
 
-        result = Activity.decrease_ticket_exclusive(activity.id)
+        result = Activity.decrease_ticket_dangerous_not_exclusive(activity.id)
         if not result:
             return self.reply_text(self.get_message('sold_out'))
 
